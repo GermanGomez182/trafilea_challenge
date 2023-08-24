@@ -4,6 +4,12 @@ class CartRepository:
 
     def create(self, user_id):
         pass
+    
+    def get(self, cart_id):
+        pass
 
     def get_by_user_id(self, user_id):
+        pass
+    
+    def update(self, cart):
         pass
