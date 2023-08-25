@@ -1,21 +1,26 @@
-class Cart:
-    def __init__(self, cart_id, user_id):
-        self.cart_id = cart_id
-        self.user_id = user_id
-        self.products = [] 
-        
-    def add_product(self, product, quantity):
-        if product in self.products:
-            self.products[product] += quantity
-        else:
-            self.products[product] = quantity
-    
-    def set_products(self, product_list):
-        self.products = product_list
+from flask_sqlalchemy import SQLAlchemy
 
-class Product:
-    def __init__(self, product_id, name, category, price):
-        self.product_id = product_id
-        self.name = name
-        self.category = category
-        self.price = price
+db = SQLAlchemy()
+
+class Cart(db.Model):
+    __tablename__ = 'carts'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String, nullable=False)
+    cart_products = db.relationship('CartProduct', back_populates='cart')
+
+class Product(db.Model):
+    __tablename__ = 'products'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    category = db.Column(db.String, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    cart_products = db.relationship('CartProduct', back_populates='product')
+
+class CartProduct(db.Model):
+    __tablename__ = 'cart_products'
+    id = db.Column(db.Integer, primary_key=True)
+    cart_id = db.Column(db.Integer, db.ForeignKey('carts.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    cart = db.relationship('Cart', back_populates='cart_products')
+    product = db.relationship('Product', back_populates='cart_products')
