@@ -62,6 +62,26 @@ class TestCartRoutes(unittest.TestCase):
             'user_id': 'user1234',
             'products': []
         })
+        
+    
+    @patch('app.routes.cart_routes.cart_repo', autospec=True)
+    def test_modify_product_quantity(self, mock_cart_repo):
+        cart_id = 1
+        cart = Cart(user_id=self.cart_data['user_id'])
+        cart.id = cart_id
+        mock_cart_repo.get.return_value = cart
+        
+        product_id = 1
+        new_quantity = 5
+        
+        response = self.app.put(f'/carts/{cart_id}/modify_product_quantity/{product_id}', json={'quantity': new_quantity})
+        
+        mock_cart_repo.get.assert_called_once_with(cart_id)
+        mock_cart_repo.modify_product_quantity.assert_called_once_with(cart, product_id, new_quantity)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {'message': 'Product quantity modified'})
+
 
 if __name__ == '__main__':
     unittest.main()

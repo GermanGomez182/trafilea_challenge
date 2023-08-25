@@ -43,3 +43,17 @@ def add_product_to_cart(cart_id):
         return jsonify({'message': 'Failed to add product to cart'}), 500
 
     return jsonify({'message': 'Product added to cart'}), 200
+
+@cart_bp.route('/carts/<int:cart_id>/modify_product_quantity/<int:product_id>', methods=['PUT'])
+def modify_product_quantity(cart_id, product_id):
+    new_quantity = request.json.get('quantity')
+
+    cart = cart_repo.get(cart_id)
+    if not cart:
+        return jsonify({'message': 'Cart not found'}), 404
+
+    success = cart_repo.modify_product_quantity(cart, product_id, new_quantity)
+    if success:
+        return jsonify({'message': 'Product quantity modified'}), 200
+    else:
+        return jsonify({'message': 'Product not found in cart'}), 404

@@ -23,6 +23,14 @@ class CartRepository:
             self.db.session.rollback()
             return False
 
+    def modify_product_quantity(self, cart, product_id, new_quantity):
+            cart_product = self.db.session.query(CartProduct).filter_by(cart=cart, product_id=product_id).first()
+            if cart_product:
+                cart_product.quantity = new_quantity
+                self.db.session.commit()
+                return True
+            return False
+
 
 class ProductRepository:
     def __init__(self, db):
