@@ -24,3 +24,15 @@ class CartProduct(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     cart = db.relationship('Cart', back_populates='cart_products')
     product = db.relationship('Product', back_populates='cart_products')
+
+
+class Order(db.Model):
+    __tablename__ = 'orders'
+    id = db.Column(db.Integer, primary_key=True)
+    cart_id = db.Column(db.Integer, db.ForeignKey('carts.id'), nullable=False)
+        
+    totals = db.Column(db.JSON, nullable=False)
+    
+    def __init__(self, cart_id, totals):
+        self.cart_id = cart_id
+        self.totals = totals

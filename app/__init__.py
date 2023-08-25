@@ -7,9 +7,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///localdb.db'
 # Import the blueprints after creating the Flask app
 from app.routes.cart_routes import cart_bp
 from app.routes.product_routes import product_bp
+from app.routes.order_routes import order_bp
+
 
 app.register_blueprint(cart_bp)
 app.register_blueprint(product_bp)
+app.register_blueprint(order_bp)
 
 db.init_app(app)
 with app.app_context():

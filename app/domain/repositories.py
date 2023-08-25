@@ -1,4 +1,6 @@
-from app.domain.models import Cart, Product, CartProduct
+from app.domain.models import Cart, Product, CartProduct, Order
+from app.domain.models import Order
+
 
 class CartRepository:
     def __init__(self, db):
@@ -48,3 +50,28 @@ class ProductRepository:
 
     def get(self, product_id):
         return Product.query.get(product_id)
+    
+
+class OrderRepository:
+    def __init__(self, db, cart_repo, totals_service):
+        self.db = db
+        self.cart_repo = cart_repo
+        self.totals_service = totals_service
+    
+    def create(self, cart):
+        products_total = self.totals_service.calculate_products_total(cart)
+        discounts_total = self.totals_service.calculate_discounts_total(cart)
+        shipping_total = self.totals_service.calculate_shipping_total(cart)
+        order_total = self.totals_service.calculate_order_total(cart)
+        
+        totals = {
+            'products': products_total,
+            'discounts': discounts_total,
+            'shipping': shipping_total,
+            'order': order_total
+        }
+        
+        order = Order(cart_id=cart.id, totals=totals)
+        self.db.session.add(order)
+        self.db.session.commit()
+        return order
