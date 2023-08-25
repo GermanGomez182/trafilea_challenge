@@ -14,12 +14,32 @@ def create_cart():
     cart_id = cart_repo.create(user_id)
     return jsonify({'cart_id': cart_id}), 201
 
+@cart_bp.route('/cart/<int:cart_id>', methods=['GET'])
+def get_cart(cart_id):
+    cart = cart_repo.get(cart_id)
+    if cart is None:
+        return jsonify({'message': 'Cart not found'}), 404
+
+    cart_data = {
+        'cart_id': cart.cart_id,
+        'user_id': cart.user_id,
+        'products': cart.products
+    }
+    return jsonify(cart_data), 200
 
 @cart_bp.route('/cart/<int:cart_id>/add_product', methods=['POST'])
 def add_product_to_cart(cart_id):
     product_data = request.json
     cart = cart_repo.get(cart_id)
-    cart.add_product(product_data['product_id'], product_data['quantity'])
-    cart_repo.update(cart)
+    
+    if cart is None:
+        return jsonify({'message': 'Cart not found'}), 404
+
+    success = cart_repo.add_product(cart_id, product_data['product_id'], product_data['quantity'])
+    if not success:
+        return jsonify({'message': 'Failed to add product to cart'}), 500
+
     return jsonify({'message': 'Product added to cart'}), 200
+
+
 
