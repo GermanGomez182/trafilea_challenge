@@ -53,17 +53,26 @@ class ProductRepository:
     
 
 class OrderRepository:
-    def __init__(self, db, cart_repo, totals_service):
+    def __init__(self, db, cart_repo, totals_service, product_repo):
         self.db = db
         self.cart_repo = cart_repo
         self.totals_service = totals_service
+        self.product_repo = product_repo
     
     def create(self, cart):
+        coffee_discount = self.totals_service.calculate_free_coffee_discount(cart)
+        
+        if coffee_discount > 0:
+            # Find the first coffee product in the cart and increment its quantity
+            coffee_product = next((cp for cp in cart.cart_products if cp.product.category == 'Coffee'), None)
+            if coffee_product:
+                coffee_product.quantity += 1
+             
         products_total = self.totals_service.calculate_products_total(cart)
         discounts_total = self.totals_service.calculate_discounts_total(cart)
         shipping_total = self.totals_service.calculate_shipping_total(cart)
         order_total = self.totals_service.calculate_order_total(cart)
-        
+   
         totals = {
             'products': products_total,
             'discounts': discounts_total,

@@ -5,7 +5,9 @@ from app.domain.services.totals_service import TotalsService
 from app.domain.models import db
 
 cart_repo = CartRepository(db)
-order_repo = OrderRepository(db, cart_repo, TotalsService())
+product_repo = ProductRepository(db)
+order_repo = OrderRepository(db, cart_repo, TotalsService(), product_repo)
+
 order_bp = Blueprint('order', __name__)
 
 
