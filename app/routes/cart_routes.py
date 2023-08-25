@@ -23,7 +23,10 @@ def get_cart(cart_id):
     cart_data = {
         'cart_id': cart.id,
         'user_id': cart.user_id,
-        'products': [{'product_id': product_cart.product.id, 'quantity': product_cart.quantity} for product_cart in cart.cart_products]
+        'products': [{'product_id': product_cart.product.id,
+                      'product': product_cart.product.name,
+                      'category': product_cart.product.category,
+                      'quantity': product_cart.quantity} for product_cart in cart.cart_products]
     }
     return jsonify(cart_data), 200
 
