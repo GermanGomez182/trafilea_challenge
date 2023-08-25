@@ -4,10 +4,18 @@ class Cart:
         self.user_id = user_id
         self.products = [] 
         
-    def add_product(self, product_id, quantity):
-        for product in self.products:
-            if product['product_id'] == product_id:
-                product['quantity'] += quantity
-                return
+    def add_product(self, product, quantity):
+        if product in self.products:
+            self.products[product] += quantity
+        else:
+            self.products[product] = quantity
+    
+    def set_products(self, product_list):
+        self.products = product_list
 
-        self.products.append({'product_id': product_id, 'quantity': quantity})
+class Product:
+    def __init__(self, product_id, name, category, price):
+        self.product_id = product_id
+        self.name = name
+        self.category = category
+        self.price = price

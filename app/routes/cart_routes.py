@@ -8,13 +8,13 @@ cart_bp = Blueprint('cart', __name__)
 
 cart_repo = CartRepository(CartDatabase())
 
-@cart_bp.route('/cart', methods=['POST'])
+@cart_bp.route('/carts', methods=['POST'])
 def create_cart():
     user_id = request.json.get('user_id')
     cart_id = cart_repo.create(user_id)
     return jsonify({'cart_id': cart_id}), 201
 
-@cart_bp.route('/cart/<int:cart_id>', methods=['GET'])
+@cart_bp.route('/carts/<int:cart_id>', methods=['GET'])
 def get_cart(cart_id):
     cart = cart_repo.get(cart_id)
     if cart is None:
@@ -27,11 +27,10 @@ def get_cart(cart_id):
     }
     return jsonify(cart_data), 200
 
-@cart_bp.route('/cart/<int:cart_id>/add_product', methods=['POST'])
+@cart_bp.route('/carts/<int:cart_id>/add_product', methods=['POST'])
 def add_product_to_cart(cart_id):
     product_data = request.json
     cart = cart_repo.get(cart_id)
-    
     if cart is None:
         return jsonify({'message': 'Cart not found'}), 404
 

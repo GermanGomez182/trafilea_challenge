@@ -15,7 +15,7 @@ class TestCartRoutes(unittest.TestCase):
     @patch('app.routes.cart_routes.cart_repo', autospec=True)
     def test_create_cart(self, mock_cart_repo):
         mock_cart_repo.create.return_value = 1
-        response = self.app.post('/cart', json=self.cart_data)
+        response = self.app.post('/carts', json=self.cart_data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json, {'cart_id': 1})
     
@@ -29,7 +29,7 @@ class TestCartRoutes(unittest.TestCase):
         product_data = {'product_id': 1, 'quantity': 3}
 
         with patch.object(mock_cart_repo, 'add_product') as mock_add_product:
-            response = self.app.post(f'/cart/{cart_id}/add_product', json=product_data)
+            response = self.app.post(f'/carts/{cart_id}/add_product', json=product_data)
 
             mock_add_product.assert_called_once_with(cart_id, product_data['product_id'], product_data['quantity'])
             self.assertEqual(response.status_code, 200)
@@ -44,7 +44,7 @@ class TestCartRoutes(unittest.TestCase):
         cart.products = []
         mock_cart_repo.get.return_value = cart
 
-        response = self.app.get('/cart/1')
+        response = self.app.get('/carts/1')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
