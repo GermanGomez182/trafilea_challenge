@@ -1,5 +1,7 @@
 from app.domain.models import Cart, Product, CartProduct, Order
 from app.domain.models import Order
+from app.exceptions import OrderCreationError
+
 
 
 class CartRepository:
@@ -60,6 +62,10 @@ class OrderRepository:
         self.product_repo = product_repo
     
     def create(self, cart):
+        existing_order = self.get_order_by_cart(cart.id)
+        if existing_order:
+            
+            raise OrderCreationError("An order already exists for this cart.")
         coffee_discount = self.totals_service.calculate_free_coffee_discount(cart)
         
         if coffee_discount > 0:
@@ -84,3 +90,6 @@ class OrderRepository:
         self.db.session.add(order)
         self.db.session.commit()
         return order
+    
+    def get_order_by_cart(self, cart_id):
+        return self.db.session.query(Order).filter_by(cart_id=cart_id).first()

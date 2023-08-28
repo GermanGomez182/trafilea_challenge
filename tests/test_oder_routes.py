@@ -5,6 +5,7 @@ from app.domain.models import Cart, Product, Order
 from app.domain.repositories import CartRepository, ProductRepository, OrderRepository
 from app.domain.services.totals_service import TotalsService
 from app.domain.models import db
+from app.exceptions import OrderCreationError  # Import the custom exception
 
 class TestOrderRoutes(unittest.TestCase):
     def setUp(self):
@@ -31,7 +32,7 @@ class TestOrderRoutes(unittest.TestCase):
         cart_id = 33
         cart = Cart(user_id=self.cart_data['user_id'])
         cart.id = cart_id
-        mock_cart_repo.get.return_value = cart
+        mock_cart_repo.get.return_value = cart_id
         
         order_id = 1
         order = Order(cart.id, totals={'products': 100.0, 'discounts': 10.0, 'shipping': 0.0, 'order': 90.0})
@@ -42,6 +43,21 @@ class TestOrderRoutes(unittest.TestCase):
         
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json, {'order_totals': {'products': 100.0, 'discounts': 10.0, 'shipping': 0.0, 'order': 90.0}})
+        
+    @patch('app.routes.order_routes.cart_repo', autospec=True)
+    @patch('app.routes.order_routes.order_repo', autospec=True)
+    def test_create_order_with_existing_order(self, mock_order_repo, mock_cart_repo):
+        cart_id = 33
+        cart = Cart(user_id=self.cart_data['user_id'])
+        cart.id = cart_id
+        mock_cart_repo.get.return_value = cart
+        
+        
+        mock_order_repo.create.side_effect = OrderCreationError("An order already exists for this cart.")
+        response = self.app.post('/carts/33/orders')
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json, {'error': 'An order already exists for this cart.'})
 
 if __name__ == '__main__':
     unittest.main()
