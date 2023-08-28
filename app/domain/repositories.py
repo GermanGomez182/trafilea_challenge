@@ -19,8 +19,14 @@ class CartRepository:
 
     def add_product(self, cart, product, quantity):
         try:
-            cart_product = CartProduct(cart=cart, product=product, quantity=quantity)
-            self.db.session.add(cart_product)
+            existing_cart_product = self.db.session.query(CartProduct).filter_by(cart=cart, product=product).first()
+            
+            if existing_cart_product:
+                existing_cart_product.quantity += quantity
+            else:
+                cart_product = CartProduct(cart=cart, product=product, quantity=quantity)
+                self.db.session.add(cart_product)
+            
             self.db.session.commit()
             return True
         except Exception as e:
